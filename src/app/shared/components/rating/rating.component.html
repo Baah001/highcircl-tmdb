@@ -1,4 +1,9 @@
 <span class="rating" [attr.aria-label]="'Rating ' + rating()">
   <span class="rating__star">★</span>
-  <span class="rating__value">{{ rating() | number: '1.1-1' }}</span>
+  <span
+    class="rating__value"
+    [class.rating__value--na]="rating() === 0"
+  >
+    {{ rating() > 0 ? (rating() | number:'1.1-1') : 'N/A' }}
+  </span>
 </span>

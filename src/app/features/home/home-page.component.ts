@@ -1,11 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal, } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { catchError, debounceTime, distinctUntilChanged, map, merge, of, skip, switchMap, tap, } from 'rxjs';
-
-import { TmdbMoviesApiService } from '../../core/tmdb/tmdb-movies-api.service';
 import type { MovieListItemModel } from '../../core/tmdb/models/movie.models';
 import { MovieListItemComponent } from '../../shared/components/movie-list-item/movie-list-item.component';
 import { StatusPanelComponent } from '../../shared/components/status-panel/status-panel.component';
+import { TmdbMoviesApiService } from '../../core/tmdb/services/tmdb-movies-api.service';
 
 type HomeViewState =
   | { status: 'loading' }

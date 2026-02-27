@@ -2,7 +2,7 @@ export interface MovieListItemModel {
   id: number;
   title: string;
   releaseDate: string;
-  posterThumbnailUrl?: string;
+  posterThumbnailUrl?: string | null;
   rating: number;
 }
 

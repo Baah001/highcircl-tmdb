@@ -1,59 +1,82 @@
-# HighcirclTmdb
+# Cinefy
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.2.
+Cinefy is a small Angular application that integrates with the TMDB API to browse popular movies, search by title, and explore detailed movie information.
 
-## Development server
+The goal of this project was to build a clean, maintainable, and production-ready Angular application with clear architecture, test coverage, and thoughtful UI handling for edge cases.
 
-To start a local development server, run:
+---
 
+## Features
+
+- Browse popular movies
+- Search movies by title
+- Detailed movie view (poster, backdrop, runtime, language, genres, overview)
+- Graceful handling of missing data
+- Loading and error states
+- Responsive layout
+- Unit tests using Vitest
+
+---
+
+## Tech Stack
+
+- Angular (standalone APIs, signals, functional interceptors)
+- RxJS
+- Vitest for unit testing
+- TMDB REST API
+- SCSS for styling
+
+---
+
+## Architecture Notes
+
+The project follows a clear separation of concerns:
+
+- `core/` → API services, DTOs, mappers, config tokens, interceptors
+- `features/` → Feature-level pages (home, movie details)
+- `shared/` → Reusable UI components
+- Explicit DTO → Model mapping layer
+- Union-based view state modeling for predictable UI states
+
+The UI remains stable even when optional data (poster, backdrop, runtime, overview) is missing.
+
+---
+
+## Getting Started
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start development server:
 ```bash
 ng serve
 ```
+Open: http://localhost:4200
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Testing
+Run unit tests:
 
 ```bash
 ng test
 ```
+The project uses Vitest for fast and isolated unit testing of services, mappers, interceptors, and components.
 
-## Running end-to-end tests
+## Environment Configuration
 
-For end-to-end (e2e) testing, run:
+TMDB configuration is provided via an Angular injection token.
 
-```bash
-ng e2e
+Set your API key inside:
+
+```src/environments/environment.local.ts```
+
+Example:
 ```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+tmdb: {
+  baseUrl: 'https://api.themoviedb.org/3',
+  apiKey: 'YOUR_API_KEY',
+  language: 'en-US'
+}
+```

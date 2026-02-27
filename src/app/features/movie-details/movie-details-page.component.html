@@ -1,46 +1,42 @@
-<a
-  routerLink="/"
-  class="details__back-button"
->
+<a routerLink="/" class="details__back-button">
   ← Back to Home
 </a>
+
 <div class="details">
   @if (isLoading()) {
-    <app-status-panel title="Loading" message="Fetching movie details..."></app-status-panel>
+    <app-status-panel title="Loading" message="Fetching movie details..." />
   }
 
   @if (!isLoading() && errorMessage()) {
-    <app-status-panel title="Something went wrong" [message]="errorMessage()"></app-status-panel>
+    <app-status-panel title="Something went wrong" [message]="errorMessage()" />
   }
 
   @if (readyState(); as state) {
     <section
       class="details__hero"
-      [style.--hero-backdrop]="'url(' + (state.movie.backdropUrl ?? state.movie.posterUrl ?? '') + ')'"
+      [class.details__hero--no-backdrop]="!(state.movie.backdropUrl || state.movie.posterUrl)"
+      [style.--hero-backdrop]="(state.movie.backdropUrl || state.movie.posterUrl) ? 'url(' + (state.movie.backdropUrl ?? state.movie.posterUrl ?? '') + ')' : null"
     >
       <div class="details__hero-overlay"></div>
 
       <div class="details__container details__hero-content">
         <div class="details__grid">
           <div class="details__poster">
-            @if (state.movie.posterUrl) {
-              <img
-                [src]="state.movie.posterUrl"
-                [alt]="state.movie.title"
-                loading="eager"
-              />
-            } @else {
-              <div class="details__poster-placeholder" aria-hidden="true"></div>
-            }
+            <img
+              class="details__poster-image"
+              [src]="state.movie.posterUrl || '/assets/poster-placeholder.svg'"
+              [alt]="state.movie.title"
+              loading="eager"
+            />
           </div>
 
           <div class="details__meta">
             <div class="details__kicker">
               <span class="details__badge">
-                {{ state.movie.rating | number:'1.1-1' }}
+                <app-rating [rating]="state.movie.rating"></app-rating>
               </span>
               <span class="details__dot" aria-hidden="true"></span>
-              <span class="details__muted">{{ state.movie.releaseDate }}</span>
+              <span class="details__muted">{{ state.movie.releaseDate || '—' }}</span>
             </div>
 
             <h1 class="details__title">{{ state.movie.title }}</h1>
@@ -61,13 +57,15 @@
                 <div class="details__genre-row">
                   @for (genre of state.movie.genres; track genre) {
                     <span class="details__chip">{{ genre }}</span>
+                  } @empty {
+                    <span class="details__chip details__chip--muted">—</span>
                   }
                 </div>
               </div>
             </div>
 
             <p class="details__overview">
-              {{ state.movie.overview }}
+              {{ state.movie.overview || '—' }}
             </p>
           </div>
         </div>
@@ -78,7 +76,7 @@
       <div class="details__panel">
         <div class="details__panel-title">Overview</div>
         <div class="details__panel-body">
-          {{ state.movie.overview }}
+          {{ state.movie.overview || '—' }}
         </div>
       </div>
     </div>

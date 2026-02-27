@@ -4,8 +4,8 @@ import { of, throwError } from 'rxjs';
 import { beforeEach, describe, expect, it, vi, afterEach } from 'vitest';
 
 import { HomePageComponent } from './home-page.component';
-import { TmdbMoviesApiService } from '../../core/tmdb/tmdb-movies-api.service';
 import type { MovieListItemModel } from '../../core/tmdb/models/movie.models';
+import { TmdbMoviesApiService } from '../../core/tmdb/services/tmdb-movies-api.service';
 
 @Component({
   selector: 'app-movie-list-item',

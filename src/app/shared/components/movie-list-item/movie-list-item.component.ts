@@ -13,4 +13,22 @@ import { RatingComponent } from '../rating/rating.component';
 })
 export class MovieListItemComponent {
   readonly movie = input.required<MovieListItemModel>();
+
+  formatDate(date: string): string {
+    if (!date) {
+      return '—';
+    }
+
+    const parsedDate = new Date(date);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+      return '—';
+    }
+
+    return new Intl.DateTimeFormat('en', {
+      year: 'numeric',
+      month: 'short',
+      day: '2-digit',
+    }).format(parsedDate);
+  }
 }

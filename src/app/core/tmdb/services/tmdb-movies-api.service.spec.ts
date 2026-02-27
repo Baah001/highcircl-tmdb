@@ -1,10 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
-
-import { TMDB_CONFIG } from '../config/tmdb-config.token';
 import { TmdbMoviesApiService } from './tmdb-movies-api.service';
-import { tmdbAuthInterceptor } from '../http/interceptors/tmdb-auth.interceptor';
+import { tmdbAuthInterceptor } from '../../http/interceptors/tmdb-auth.interceptor';
+import { TMDB_CONFIG } from '../../config/tmdb-config.token';
 
 describe('TmdbMoviesApiService', () => {
   let httpTestingController: HttpTestingController;

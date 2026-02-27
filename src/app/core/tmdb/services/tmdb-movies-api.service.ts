@@ -2,14 +2,12 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import type { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { TMDB_CONFIG } from '../../config/tmdb-config.token';
+import { MovieDetailsModel, MovieListItemModel } from '../models/movie.models';
+import { TmdbMovieDetailsDto, TmdbMovieListResponseDto } from '../models/tmdb-movie.dto';
+import { mapToMovieDetailsModel, mapToMovieListItemModel } from '../tmdb-mappers';
 
-import { TMDB_CONFIG } from '../config/tmdb-config.token';
-import type {
-  TmdbMovieDetailsDto,
-  TmdbMovieListResponseDto,
-} from './models/tmdb-movie.dto';
-import type { MovieDetailsModel, MovieListItemModel } from './models/movie.models';
-import { mapToMovieDetailsModel, mapToMovieListItemModel } from './tmdb-mappers';
+
 
 @Injectable({ providedIn: 'root' })
 export class TmdbMoviesApiService {

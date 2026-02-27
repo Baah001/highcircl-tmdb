@@ -1,19 +1,13 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  DestroyRef,
-  computed,
-  inject,
-  signal,
-} from '@angular/core';
-import { DecimalPipe, UpperCasePipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal, } from '@angular/core';
+import { UpperCasePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { EMPTY, catchError, map, switchMap, tap } from 'rxjs';
+import { catchError, EMPTY, map, switchMap, tap } from 'rxjs';
 
-import { TmdbMoviesApiService } from '../../core/tmdb/tmdb-movies-api.service';
 import type { MovieDetailsModel } from '../../core/tmdb/models/movie.models';
 import { StatusPanelComponent } from '../../shared/components/status-panel/status-panel.component';
+import { TmdbMoviesApiService } from '../../core/tmdb/services/tmdb-movies-api.service';
+import { RatingComponent } from '../../shared/components/rating/rating.component';
 
 type MovieDetailsViewState =
   | { status: 'loading' }
@@ -23,7 +17,7 @@ type MovieDetailsViewState =
 @Component({
   selector: 'app-movie-details-page',
   standalone: true,
-  imports: [StatusPanelComponent, DecimalPipe, UpperCasePipe, RouterLink],
+  imports: [StatusPanelComponent, UpperCasePipe, RouterLink, RatingComponent],
   templateUrl: './movie-details-page.component.html',
   styleUrl: './movie-details-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

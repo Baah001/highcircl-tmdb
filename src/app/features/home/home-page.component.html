@@ -17,7 +17,7 @@
   </div>
 
   @if (isLoading()) {
-    <app-status-panel title="Loading" message="Fetching movies..."></app-status-panel>
+    <app-status-panel title="Loading" message="Fetching movies..."/>
   }
 
   @if (!isLoading() && errorMessage()) {
@@ -26,7 +26,7 @@
       [message]="errorMessage()"
       buttonLabel="Try again"
       (buttonClick)="onRetry()"
-    ></app-status-panel>
+    />
   }
 
   @if (readyState(); as state) {
@@ -38,7 +38,7 @@
       <app-status-panel
         title="No results"
         [message]="'No results found for ' + state.query"
-        ></app-status-panel>
+        />
     }
 
     <div class="home__list">

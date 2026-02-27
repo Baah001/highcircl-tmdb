@@ -1,8 +1,8 @@
-export type TmdbImageSize = 'w185' | 'w500' | 'original';
+import { TmdbImageSizes } from '../constants/tmdb-image-sizes';
 
 export function createTmdbImageUrl(
   posterPath: string,
-  size: TmdbImageSize
+  size: TmdbImageSizes
 ): string {
   return `https://image.tmdb.org/t/p/${size}${posterPath}`;
 }

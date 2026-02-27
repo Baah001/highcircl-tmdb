@@ -11,8 +11,8 @@
 
   <div class="movie-row__content">
     <div class="movie-row__title">{{ movieItem.title }}</div>
-    <div class="movie-row__subtitle">{{ movieItem.releaseDate }}</div>
+    <div class="movie-row__subtitle">{{ formatDate(movieItem.releaseDate) }}</div>
   </div>
 
-  <app-rating [rating]="movieItem.rating"></app-rating>
+  <app-rating [rating]="movieItem.rating"/>
 </a>
