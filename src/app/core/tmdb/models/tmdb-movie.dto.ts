@@ -23,6 +23,7 @@ export interface TmdbMovieDetailsDto {
   vote_average: number;
   runtime: number | null;
   original_language: string;
+  backdrop_path: string | null;
 }
 
 export interface TmdbGenreDto {

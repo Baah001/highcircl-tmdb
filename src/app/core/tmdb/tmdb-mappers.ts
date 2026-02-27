@@ -34,6 +34,7 @@ export function mapToMovieDetailsModel(
     posterUrl: dto.poster_path
       ? createTmdbImageUrl(dto.poster_path, 'w500')
       : undefined,
+    backdropUrl: dto.backdrop_path ? createTmdbImageUrl(dto.backdrop_path, 'original') : undefined,
     overview: dto.overview,
     genres: dto.genres.map((genre) => genre.name),
     rating: dto.vote_average,

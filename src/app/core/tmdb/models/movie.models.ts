@@ -16,4 +16,5 @@ export interface MovieDetailsModel {
   rating: number;
   runtimeMinutes?: number;
   languageCode: string;
+  backdropUrl?: string;
 }
