@@ -1,13 +1,14 @@
 import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal, } from '@angular/core';
-import { UpperCasePipe } from '@angular/common';
+import { DatePipe, UpperCasePipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, EMPTY, map, switchMap, tap } from 'rxjs';
+import { catchError, EMPTY, finalize, map, switchMap, tap } from 'rxjs';
 
 import type { MovieDetailsModel } from '../../core/tmdb/models/movie.models';
 import { StatusPanelComponent } from '../../shared/components/status-panel/status-panel.component';
 import { TmdbMoviesApiService } from '../../core/tmdb/services/tmdb-movies-api.service';
 import { RatingComponent } from '../../shared/components/rating/rating.component';
+import { LoaderService } from '../../shared/services/loader.service';
 
 type MovieDetailsViewState =
   | { status: 'loading' }
@@ -17,7 +18,7 @@ type MovieDetailsViewState =
 @Component({
   selector: 'app-movie-details-page',
   standalone: true,
-  imports: [StatusPanelComponent, UpperCasePipe, RouterLink, RatingComponent],
+  imports: [StatusPanelComponent, UpperCasePipe, RouterLink, RatingComponent, DatePipe],
   templateUrl: './movie-details-page.component.html',
   styleUrl: './movie-details-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -26,6 +27,7 @@ export class MovieDetailsPageComponent {
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly tmdbMoviesApiService = inject(TmdbMoviesApiService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly loaderService = inject(LoaderService);
 
   readonly viewState = signal<MovieDetailsViewState>({ status: 'loading' });
 
@@ -49,7 +51,10 @@ export class MovieDetailsPageComponent {
 
     movieId$
       .pipe(
-        tap(() => this.viewState.set({ status: 'loading' })),
+        tap(() => {
+          this.viewState.set({ status: 'loading' });
+          this.loaderService.show();
+        }),
 
         switchMap((movieId) => {
           if (movieId === null) {
@@ -57,22 +62,25 @@ export class MovieDetailsPageComponent {
               status: 'error',
               message: 'Invalid movie id.',
             });
+            this.loaderService.hide();
             return EMPTY;
           }
 
-          return this.tmdbMoviesApiService.getMovieDetails(movieId);
-        }),
-
-        tap((movie) => {
-          this.viewState.set({ status: 'ready', movie });
-        }),
-
-        catchError(() => {
-          this.viewState.set({
-            status: 'error',
-            message: 'Could not load movie details.',
-          });
-          return EMPTY;
+          return this.tmdbMoviesApiService.getMovieDetails(movieId).pipe(
+            tap((movie) => {
+              this.viewState.set({ status: 'ready', movie });
+            }),
+            catchError(() => {
+              this.viewState.set({
+                status: 'error',
+                message: 'Could not load movie details.',
+              });
+              return EMPTY;
+            }),
+            finalize(() => {
+              this.loaderService.hide();
+            })
+          );
         }),
 
         takeUntilDestroyed(this.destroyRef)

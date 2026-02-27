@@ -16,9 +16,13 @@
     />
   </div>
 
-  @if (isLoading()) {
-    <app-status-panel title="Loading" message="Fetching movies..."/>
-  }
+  <div class="home__section-title">
+    @if (readyState(); as state) {
+      @if (state.mode === 'popular') { Popular Movies } @else { Search Results }
+    } @else {
+      Popular Movies
+    }
+  </div>
 
   @if (!isLoading() && errorMessage()) {
     <app-status-panel
@@ -30,21 +34,17 @@
   }
 
   @if (readyState(); as state) {
-    <div class="home__section-title">
-      @if (state.mode === 'popular') { Popular Movies } @else { Search Results }
-    </div>
-
     @if (state.mode === 'search' && state.movies.length === 0) {
       <app-status-panel
         title="No results"
         [message]="'No results found for ' + state.query"
-        />
+      />
+    } @else {
+      <div class="home__list">
+        @for (movie of state.movies; track movie.id) {
+          <app-movie-list-item [movie]="movie"></app-movie-list-item>
+        }
+      </div>
     }
-
-    <div class="home__list">
-      @for (movie of state.movies; track trackByMovieId($index, movie)) {
-        <app-movie-list-item [movie]="movie"></app-movie-list-item>
-      }
-    </div>
   }
 </div>

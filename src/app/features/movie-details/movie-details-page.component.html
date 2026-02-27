@@ -31,15 +31,14 @@
           </div>
 
           <div class="details__meta">
+            <h1 class="details__title">{{ state.movie.title }}</h1>
             <div class="details__kicker">
               <span class="details__badge">
                 <app-rating [rating]="state.movie.rating"></app-rating>
               </span>
               <span class="details__dot" aria-hidden="true"></span>
-              <span class="details__muted">{{ state.movie.releaseDate || '—' }}</span>
+              <span class="details__muted">{{ state.movie.releaseDate ? (state.movie.releaseDate | date:'longDate') : '—' }}</span>
             </div>
-
-            <h1 class="details__title">{{ state.movie.title }}</h1>
 
             <div class="details__facts">
               <div class="details__fact">

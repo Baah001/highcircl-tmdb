@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { DecimalPipe, UpperCasePipe } from '@angular/common';
+import { DatePipe, DecimalPipe, UpperCasePipe } from '@angular/common';
 import { ActivatedRoute, convertToParamMap, provideRouter, RouterLink } from '@angular/router';
 import { TestBed } from '@angular/core/testing';
 import { BehaviorSubject, NEVER, of, throwError } from 'rxjs';
@@ -8,6 +8,16 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MovieDetailsPageComponent } from './movie-details-page.component';
 import type { MovieDetailsModel } from '../../core/tmdb/models/movie.models';
 import { TmdbMoviesApiService } from '../../core/tmdb/services/tmdb-movies-api.service';
+import { LoaderService } from '../../shared/services/loader.service';
+
+@Component({
+  selector: 'app-rating',
+  standalone: true,
+  template: `<span data-testid="rating">{{ rating.toFixed(1) }}</span>`,
+})
+class RatingStubComponent {
+  @Input({ required: true }) rating!: number;
+}
 
 @Component({
   selector: 'app-status-panel',
@@ -31,6 +41,7 @@ class StatusPanelStubComponent {
 
 describe('MovieDetailsPageComponent (template)', () => {
   let tmdbMoviesApiServiceMock: { getMovieDetails: ReturnType<typeof vi.fn> };
+  let loaderServiceMock: { show: ReturnType<typeof vi.fn>; hide: ReturnType<typeof vi.fn> };
   let paramMapSubject: BehaviorSubject<ReturnType<typeof convertToParamMap>>;
 
   const mockMovie: MovieDetailsModel = {
@@ -51,21 +62,28 @@ describe('MovieDetailsPageComponent (template)', () => {
       getMovieDetails: vi.fn().mockReturnValue(of(mockMovie)),
     };
 
+    loaderServiceMock = {
+      show: vi.fn(),
+      hide: vi.fn(),
+    };
+
     paramMapSubject = new BehaviorSubject(convertToParamMap({ movieId: '123' }));
 
     await TestBed.configureTestingModule({
-      imports: [ MovieDetailsPageComponent],
+      imports: [MovieDetailsPageComponent],
       providers: [
         provideRouter([]),
         { provide: TmdbMoviesApiService, useValue: tmdbMoviesApiServiceMock },
+        { provide: LoaderService, useValue: loaderServiceMock },
         { provide: ActivatedRoute, useValue: { paramMap: paramMapSubject.asObservable() } },
+        DatePipe,
         DecimalPipe,
         UpperCasePipe,
       ],
     })
       .overrideComponent(MovieDetailsPageComponent, {
         set: {
-          imports: [StatusPanelStubComponent, RouterLink, DecimalPipe, UpperCasePipe],
+          imports: [StatusPanelStubComponent, RatingStubComponent, RouterLink, DatePipe, DecimalPipe, UpperCasePipe],
         },
       })
       .compileComponents();
@@ -94,7 +112,7 @@ describe('MovieDetailsPageComponent (template)', () => {
     const element: HTMLElement = fixture.nativeElement;
 
     expect(element.textContent).toContain('Shelter');
-    expect(element.textContent).toContain('2026-01-28');
+    expect(element.textContent).toContain('January 28, 2026');
     expect(element.textContent).toContain('A movie overview...');
     expect(element.textContent).toContain('7.0');
     expect(element.textContent).toContain('1h 47m');
@@ -126,18 +144,20 @@ describe('MovieDetailsPageComponent (template)', () => {
 
     await TestBed.resetTestingModule()
       .configureTestingModule({
-        imports: [ MovieDetailsPageComponent],
+        imports: [MovieDetailsPageComponent],
         providers: [
           provideRouter([]),
           { provide: TmdbMoviesApiService, useValue: tmdbMoviesApiServiceMock },
+          { provide: LoaderService, useValue: loaderServiceMock },
           { provide: ActivatedRoute, useValue: { paramMap: paramMapSubject.asObservable() } },
+          DatePipe,
           DecimalPipe,
           UpperCasePipe,
         ],
       })
       .overrideComponent(MovieDetailsPageComponent, {
         set: {
-          imports: [StatusPanelStubComponent, RouterLink, DecimalPipe, UpperCasePipe],
+          imports: [StatusPanelStubComponent, RatingStubComponent, RouterLink, DatePipe, DecimalPipe, UpperCasePipe],
         },
       })
       .compileComponents();

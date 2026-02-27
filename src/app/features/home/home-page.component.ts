@@ -1,10 +1,26 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal, } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { catchError, debounceTime, distinctUntilChanged, map, merge, of, skip, switchMap, tap, } from 'rxjs';
+import {
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  EMPTY,
+  finalize,
+  map,
+  merge,
+  of,
+  skip,
+  switchMap,
+  tap
+} from 'rxjs';
+
 import type { MovieListItemModel } from '../../core/tmdb/models/movie.models';
+import { TmdbMoviesApiService } from '../../core/tmdb/services/tmdb-movies-api.service';
 import { MovieListItemComponent } from '../../shared/components/movie-list-item/movie-list-item.component';
 import { StatusPanelComponent } from '../../shared/components/status-panel/status-panel.component';
-import { TmdbMoviesApiService } from '../../core/tmdb/services/tmdb-movies-api.service';
+import { LoaderService } from '../../shared/services/loader.service';
+
+type ReadyState = Extract<HomeViewState, { status: 'ready' }>;
 
 type HomeViewState =
   | { status: 'loading' }
@@ -27,14 +43,11 @@ type HomeViewState =
 export class HomePageComponent {
   private readonly tmdbMoviesApiService = inject(TmdbMoviesApiService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly loaderService = inject(LoaderService);
 
-  // Raw input value from the search field
   readonly searchQuery = signal<string>('');
-
-  // Increment this to re-trigger a fetch without changing the query (retry)
   readonly refreshToken = signal<number>(0);
 
-  // Single source of truth for rendering
   readonly viewState = signal<HomeViewState>({ status: 'loading' });
 
   readonly isLoading = computed(() => this.viewState().status === 'loading');
@@ -53,17 +66,14 @@ export class HomePageComponent {
     const searchQuery$ = toObservable(this.searchQuery);
     const refreshToken$ = toObservable(this.refreshToken);
 
-    // Initial load should be instant (no debounce).
     const initialQuery$ = of(this.searchQuery());
 
-    // Typing should be debounced to reduce API calls.
     const debouncedTypingQuery$ = searchQuery$.pipe(
       skip(1),
       debounceTime(300),
       distinctUntilChanged()
     );
 
-    // Retry should be instant and should not be blocked by distinctUntilChanged.
     const refreshQuery$ = refreshToken$.pipe(
       skip(1),
       map(() => this.searchQuery())
@@ -71,52 +81,51 @@ export class HomePageComponent {
 
     merge(initialQuery$, debouncedTypingQuery$, refreshQuery$)
       .pipe(
-        tap(() => this.viewState.set({ status: 'loading' })),
-
-        // Cancel previous request when a new trigger comes in
+        tap(() => {
+          this.viewState.set({ status: 'loading' });
+          this.loaderService.show();
+        }),
         switchMap((query) => {
           const trimmedQuery = query.trim();
 
-          if (trimmedQuery.length === 0) {
-            return this.tmdbMoviesApiService.getPopularMovies().pipe(
-              tap((movies) => {
-                this.viewState.set({
-                  status: 'ready',
+          const request$ =
+            (trimmedQuery.length === 0
+              ? this.tmdbMoviesApiService.getPopularMovies().pipe(
+                map((movies) => ({
+                  status: 'ready' as const,
                   movies,
-                  mode: 'popular',
+                  mode: 'popular' as const,
                   query: '',
-                });
-              })
-            );
-          }
+                }))
+              )
+              : this.tmdbMoviesApiService.searchMovies(trimmedQuery).pipe(
+                map((movies) => ({
+                  status: 'ready' as const,
+                  movies,
+                  mode: 'search' as const,
+                  query: trimmedQuery,
+                }))
+              )) as unknown as import('rxjs').Observable<ReadyState>;
 
-          return this.tmdbMoviesApiService.searchMovies(trimmedQuery).pipe(
-            tap((movies) => {
+          return request$.pipe(
+            tap((nextState) => {
+              this.viewState.set(nextState);
+            }),
+            finalize(() => {
+              this.loaderService.hide();
+            }),
+            catchError(() => {
               this.viewState.set({
-                status: 'ready',
-                movies,
-                mode: 'search',
-                query: trimmedQuery,
+                status: 'error',
+                message: 'Could not load movies. Please try again.',
               });
+              return EMPTY;
             })
           );
         }),
-
-        catchError(() => {
-          this.viewState.set({
-            status: 'error',
-            message: 'Could not load movies. Please try again.',
-          });
-          return of([]);
-        }),
-
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe();
-  }
-
-  trackByMovieId(index: number, movie: MovieListItemModel): number {
-    return movie.id;
   }
 
   onRetry(): void {
