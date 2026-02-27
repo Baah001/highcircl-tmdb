@@ -3,6 +3,7 @@
 Cinefy is a small Angular application that integrates with the TMDB API to browse popular movies, search by title, and explore detailed movie information.
 
 The goal of this project was to build a clean, maintainable, and production-ready Angular application with clear architecture, test coverage, and thoughtful UI handling for edge cases.
+🔗 Live Demo: https://baah001.github.io/highcircl-tmdb/
 
 ---
 
