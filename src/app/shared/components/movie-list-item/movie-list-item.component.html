@@ -1,0 +1,17 @@
+<a class="movie-row" [routerLink]="['/movie', movie().id]">
+  <div class="movie-row__poster-wrap">
+    <img
+      class="movie-row__poster"
+      [src]="movie().posterThumbnailUrl || 'assets/poster-placeholder.svg'"
+      [alt]="movie().title + ' poster'"
+      loading="lazy"
+    />
+  </div>
+
+  <div class="movie-row__content">
+    <div class="movie-row__title">{{ movie().title }}</div>
+    <div class="movie-row__subtitle">{{ movie().releaseDate }}</div>
+  </div>
+
+  <app-rating [rating]="movie().rating"></app-rating>
+</a>

@@ -1,0 +1,13 @@
+<div class="panel">
+  <div class="panel__title">{{ title() }}</div>
+
+  @if (message()) {
+    <div class="panel__message">{{ message() }}</div>
+  }
+
+  @if (buttonLabel()) {
+    <button type="button" class="panel__button" (click)="buttonClick.emit()">
+      {{ buttonLabel() }}
+    </button>
+  }
+</div>

@@ -1,0 +1,50 @@
+<div class="home">
+  <div class="home__header">
+    <div class="home__headline">Discover movies</div>
+    <div class="home__subhead">Popular picks and fast search</div>
+  </div>
+
+  <div class="home__search">
+    <input
+      class="home__search-input"
+      type="text"
+      [value]="searchQuery()"
+      (input)="onSearchInput($event)"
+      placeholder="Search movies..."
+      autocomplete="off"
+      aria-label="Search movies"
+    />
+  </div>
+
+  @if (isLoading()) {
+    <app-status-panel title="Loading" message="Fetching movies..."></app-status-panel>
+  }
+
+  @if (!isLoading() && errorMessage()) {
+    <app-status-panel
+      title="Something went wrong"
+      [message]="errorMessage()"
+      buttonLabel="Try again"
+      (buttonClick)="onRetry()"
+    ></app-status-panel>
+  }
+
+  @if (readyState(); as state) {
+    <div class="home__section-title">
+      @if (state.mode === 'popular') { Popular Movies } @else { Search Results }
+    </div>
+
+    @if (state.mode === 'search' && state.movies.length === 0) {
+      <app-status-panel
+        title="No results"
+        [message]="'No results found for ' + state.query"
+        ></app-status-panel>
+    }
+
+    <div class="home__list">
+      @for (movie of state.movies; track trackByMovieId($index, movie)) {
+        <app-movie-list-item [movie]="movie"></app-movie-list-item>
+      }
+    </div>
+  }
+</div>
